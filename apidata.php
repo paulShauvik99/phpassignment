@@ -21,14 +21,16 @@
             while ($row = mysqli_fetch_assoc($res)){
                 $table = $row['table_name'];
                 $column_names = explode(",",$row['column_names']);
-             }
+            }
+            $cols = count($column_names);
+            // echo $cols;
         }else{
         $_SESSION['msg'] = "
             <div class='container mt-5'>
                 <h1 class='mt-5 display-4 font-weight-bold'> No Results Found! </h1>
             </div>
         ";
-        header("Location: form.php");
+        header("Location: index.php");
     }
 ?>
     <!DOCTYPE html>
@@ -51,24 +53,48 @@
                 <table class="table table-bordered table-striped table-hover mt-5">
                     <thead class="thead-dark">
                         <tr class="text-center text-capitalize">
-                            <th><?php echo $column_names[0]; ?></th>
-                            <th><?php echo $column_names[1]; ?></th>                    
+                            <?php
+                                for($i = 0; $i <$cols ;$i++){
+                                    ?>
+                                    <th><?php echo $column_names[$i]; ?></th>
+                                    <?php
+                                };
+                            
+                            
+                            ?>    
                         </tr>
                     </thead>
                      <tbody>
                             <?php
-                                $sql2 = "SELECT $table.$column_names[0] as columnFirst, $table.$column_names[1] as columnLast  FROM $table";
-                                
+
+                            // $sql2 = "SELECT $table.$column_names[0] as columnFirst,$table.$column_names[1] as columnLast FROM $table";
+                            $sql2 = "Select ";
+                                for($i = 0 ; $i< $cols ;$i++){
+                                    $sql2 .= "$table.$column_names[$i] as col$i";
+                                    
+                                    if($i!= $cols -1){
+                                        $sql2 .= ",";
+                                    }
+                                }
+                            $sql2 .= " FROM $table";
+
+                            // echo $sql2;
                                 $res2 = $con->query($sql2);
             
                                 while ($row = $res2->fetch_assoc()) {
                                     ?>
-                                        <tr class="text-center">
-                                            <td> <?php echo $row['columnFirst'];?> </td>
-                                            <td> <?php echo $row['columnLast']; ?> </td>
-                                        </tr>
-                                    <?php
+                                       <tr class="text-center">
+                                        <?php
+                                           for($i = 0 ; $i < $cols ;$i++){
+                                        ?>
+                                               <td> <?php echo $row['col'.$i.''];?> </td>
+                                        <?php
+                                            }
+                                        ?>
+                                        </tr> 
+                                     <?php
                                 }
+                               
                             ?>
                     </tbody>
                 </table>
